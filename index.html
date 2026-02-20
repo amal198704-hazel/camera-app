@@ -8,10 +8,7 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- PhotoSwipe for zoomable images -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.js"></script>
-
+    <!-- Simple lightbox for images (no PhotoSwipe) -->
     <style>
         * {
             margin: 0;
@@ -224,6 +221,83 @@
             transform: scale(1.02);
         }
 
+        /* Simple lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-prev,
+        .lightbox-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-prev {
+            left: 20px;
+        }
+
+        .lightbox-next {
+            right: 20px;
+        }
+
+        .lightbox-counter {
+            position: absolute;
+            bottom: 20px;
+            color: white;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -321,51 +395,115 @@
             resize: vertical;
         }
 
-        .upload-area {
+        /* Photo Upload Buttons */
+        .photo-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .photo-upload-btn {
+            position: relative;
             border: 2px dashed #667eea;
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 12px;
             text-align: center;
             background: #f8faff;
             cursor: pointer;
             transition: all 0.2s;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        .upload-area:hover {
+        .photo-upload-btn:hover {
             background: #f0f3ff;
         }
 
-        .upload-area i {
-            font-size: 32px;
+        .photo-upload-btn i {
+            font-size: 24px;
             color: #667eea;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
-        .upload-area p {
+        .photo-upload-btn span {
+            font-size: 12px;
             color: #667eea;
             font-weight: 500;
         }
 
-        .upload-area small {
+        .photo-upload-btn small {
+            font-size: 10px;
             color: #999;
-            font-size: 12px;
+            margin-top: 4px;
         }
 
-        .previewBox {
-            height: 80px;
-            background: #f0f0f0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            overflow: hidden;
-        }
-
-        .previewBox img {
+        .photo-preview {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .photo-upload-btn.has-image {
+            border: 2px solid #28a745;
+            background: #f0fff4;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .photo-upload-btn.has-image i,
+        .photo-upload-btn.has-image span,
+        .photo-upload-btn.has-image small {
+            display: none;
+        }
+
+        .photo-upload-btn.has-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #dc3545;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10;
+            border: 1px solid #ddd;
+        }
+
+        .remove-photo:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .photo-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e0e0e0;
+        }
+
+        .photo-progress-bar {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s;
         }
 
         .pdf-badge {
@@ -543,9 +681,47 @@
             margin-right: 6px;
         }
 
-        /* Fullscreen image viewer */
-        .pswp {
-            z-index: 10000;
+        .photo-upload-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .photo-upload-note i {
+            color: #28a745;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            background: #f8faff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            background: #f0f3ff;
+        }
+
+        .upload-area i {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .upload-area small {
+            color: #999;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -700,25 +876,57 @@
 
                 <div class="form-group">
                     <label><i class="fas fa-camera"></i> Photos (4 required)</label>
-                    <input type="file" id="photos" multiple accept="image/*" capture="environment"
-                        style="display: none;">
-                    <div class="upload-area" onclick="document.getElementById('photos').click()">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Tap to select 4 photos</p>
-                        <small>JPEG, PNG accepted</small>
+                    <div class="photo-upload-note">
+                        <i class="fas fa-info-circle"></i> Tap each button to select photos from gallery
                     </div>
-                    <div class="previewGrid"
-                        style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
-                        <div class="previewBox" id="p1">Photo 1</div>
-                        <div class="previewBox" id="p2">Photo 2</div>
-                        <div class="previewBox" id="p3">Photo 3</div>
-                        <div class="previewBox" id="p4">Photo 4</div>
+
+                    <!-- Hidden file inputs for each photo -->
+                    <input type="file" id="photo1" accept="image/*" style="display: none;"
+                        onchange="handlePhotoSelect(1, this)">
+                    <input type="file" id="photo2" accept="image/*" style="display: none;"
+                        onchange="handlePhotoSelect(2, this)">
+                    <input type="file" id="photo3" accept="image/*" style="display: none;"
+                        onchange="handlePhotoSelect(3, this)">
+                    <input type="file" id="photo4" accept="image/*" style="display: none;"
+                        onchange="handlePhotoSelect(4, this)">
+
+                    <div class="photo-upload-grid">
+                        <div class="photo-upload-btn" id="photoBtn1"
+                            onclick="document.getElementById('photo1').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Photo 1</span>
+                            <small>Tap to select</small>
+                        </div>
+
+                        <div class="photo-upload-btn" id="photoBtn2"
+                            onclick="document.getElementById('photo2').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Photo 2</span>
+                            <small>Tap to select</small>
+                        </div>
+
+                        <div class="photo-upload-btn" id="photoBtn3"
+                            onclick="document.getElementById('photo3').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Photo 3</span>
+                            <small>Tap to select</small>
+                        </div>
+
+                        <div class="photo-upload-btn" id="photoBtn4"
+                            onclick="document.getElementById('photo4').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Photo 4</span>
+                            <small>Tap to select</small>
+                        </div>
                     </div>
+
+                    <div id="photoStatus" style="margin-top: 10px; font-size: 13px;"></div>
                 </div>
 
                 <div class="form-group">
                     <label><i class="fas fa-file-pdf"></i> Upload PDF Document</label>
-                    <input type="file" id="pdfFile" accept=".pdf" style="display: none;">
+                    <input type="file" id="pdfFile" accept=".pdf" style="display: none;"
+                        onchange="handlePDFSelect(this)">
                     <div class="upload-area" onclick="document.getElementById('pdfFile').click()">
                         <i class="fas fa-file-pdf"></i>
                         <p>Tap to upload PDF</p>
@@ -756,6 +964,15 @@
         </div>
     </div>
 
+    <!-- Simple Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <span class="lightbox-prev" onclick="changeImage(-1)">&#10094;</span>
+        <span class="lightbox-next" onclick="changeImage(1)">&#10095;</span>
+        <img id="lightbox-img" src="">
+        <div class="lightbox-counter" id="lightbox-counter"></div>
+    </div>
+
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
         <button class="nav-item active" onclick="showHome(event)">
@@ -785,8 +1002,17 @@
         let currentView = 'compact';
         let searchTerm = '';
 
-        // PhotoSwipe instance
-        let pswp = null;
+        // Photo storage
+        let photoFiles = {
+            1: null,
+            2: null,
+            3: null,
+            4: null
+        };
+
+        // Lightbox variables
+        let lightboxImages = [];
+        let currentImageIndex = 0;
 
         // Get user location
         navigator.geolocation.getCurrentPosition(
@@ -794,36 +1020,131 @@
                 lat = p.coords.latitude;
                 lng = p.coords.longitude;
                 locationObtained = true;
-                document.getElementById("locationStatus").innerHTML =
-                    `<i class="fas fa-check-circle" style="color: #28a745;"></i> Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                let statusEl = document.getElementById("locationStatus");
+                if (statusEl) {
+                    statusEl.innerHTML =
+                        `<i class="fas fa-check-circle" style="color: #28a745;"></i> Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                }
             },
             error => {
-                document.getElementById("locationStatus").innerHTML =
-                    '<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> Location not available. Please enable GPS.';
+                let statusEl = document.getElementById("locationStatus");
+                if (statusEl) {
+                    statusEl.innerHTML =
+                        '<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> Location not available. Please enable GPS.';
+                }
             }
         );
 
-        // Preview images
-        document.getElementById("photos").addEventListener("change", e => {
-            let files = e.target.files;
-            for (let i = 0; i < 4; i++) {
-                let box = document.getElementById("p" + (i + 1));
-                if (files[i]) {
-                    box.innerHTML = `<img src="${URL.createObjectURL(files[i])}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        // Handle photo selection
+        function handlePhotoSelect(photoNum, input) {
+            if (input.files && input.files[0]) {
+                let file = input.files[0];
+                photoFiles[photoNum] = file;
+
+                // Show preview
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    let btn = document.getElementById(`photoBtn${photoNum}`);
+                    if (btn) {
+                        btn.innerHTML = `<img src="${e.target.result}" class="photo-preview"><div class="remove-photo" onclick="removePhoto(${photoNum}, event)"><i class="fas fa-times"></i></div>`;
+                        btn.classList.add('has-image');
+                    }
+                };
+                reader.readAsDataURL(file);
+
+                updatePhotoStatus();
+            }
+        }
+
+        // Remove photo
+        function removePhoto(photoNum, event) {
+            event.stopPropagation();
+
+            // Clear the file input
+            let input = document.getElementById(`photo${photoNum}`);
+            if (input) input.value = '';
+            photoFiles[photoNum] = null;
+
+            // Reset the button
+            let btn = document.getElementById(`photoBtn${photoNum}`);
+            if (btn) {
+                btn.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Photo ${photoNum}</span>
+                    <small>Tap to select</small>
+                `;
+                btn.classList.remove('has-image');
+            }
+
+            updatePhotoStatus();
+        }
+
+        // Update photo status message
+        function updatePhotoStatus() {
+            let selectedCount = Object.values(photoFiles).filter(f => f !== null).length;
+            let statusDiv = document.getElementById('photoStatus');
+
+            if (statusDiv) {
+                if (selectedCount === 0) {
+                    statusDiv.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-circle"></i> No photos selected. Please select 4 photos.</span>';
+                } else if (selectedCount < 4) {
+                    statusDiv.innerHTML = `<span style="color: #ff9800;"><i class="fas fa-exclamation-triangle"></i> ${selectedCount}/4 photos selected. Need ${4 - selectedCount} more.</span>`;
                 } else {
-                    box.innerHTML = `Photo ${i + 1}`;
+                    statusDiv.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> All 4 photos selected!</span>';
                 }
             }
-        });
+        }
 
-        // Show PDF name
-        document.getElementById("pdfFile").addEventListener("change", e => {
-            let file = e.target.files[0];
-            if (file) {
-                document.getElementById("pdfName").innerHTML =
-                    `<i class="fas fa-check-circle" style="color: #28a745;"></i> Selected: ${file.name}`;
+        // Handle PDF selection
+        function handlePDFSelect(input) {
+            if (input.files && input.files[0]) {
+                let file = input.files[0];
+                let pdfNameEl = document.getElementById("pdfName");
+                if (pdfNameEl) {
+                    pdfNameEl.innerHTML =
+                        `<i class="fas fa-check-circle" style="color: #28a745;"></i> Selected: ${file.name}`;
+                }
             }
-        });
+        }
+
+        // Lightbox functions
+        function openLightbox(images, index) {
+            lightboxImages = images;
+            currentImageIndex = index;
+            let lightbox = document.getElementById('lightbox');
+            let img = document.getElementById('lightbox-img');
+            let counter = document.getElementById('lightbox-counter');
+
+            if (lightbox && img && counter) {
+                img.src = images[index];
+                counter.textContent = `${index + 1} of ${images.length}`;
+                lightbox.classList.add('active');
+            }
+        }
+
+        function closeLightbox() {
+            let lightbox = document.getElementById('lightbox');
+            if (lightbox) {
+                lightbox.classList.remove('active');
+            }
+        }
+
+        function changeImage(direction) {
+            currentImageIndex += direction;
+            if (currentImageIndex < 0) {
+                currentImageIndex = lightboxImages.length - 1;
+            } else if (currentImageIndex >= lightboxImages.length) {
+                currentImageIndex = 0;
+            }
+
+            let img = document.getElementById('lightbox-img');
+            let counter = document.getElementById('lightbox-counter');
+
+            if (img && counter) {
+                img.src = lightboxImages[currentImageIndex];
+                counter.textContent = `${currentImageIndex + 1} of ${lightboxImages.length}`;
+            }
+        }
 
         // Upload image to Cloudinary
         async function uploadImage(file) {
@@ -831,12 +1152,17 @@
             fd.append("file", file);
             fd.append("upload_preset", "survey_app");
 
-            let r = await fetch(
-                "https://api.cloudinary.com/v1_1/dpeuqcbtm/image/upload",
-                { method: "POST", body: fd }
-            );
-            let j = await r.json();
-            return j.secure_url;
+            try {
+                let r = await fetch(
+                    "https://api.cloudinary.com/v1_1/dpeuqcbtm/image/upload",
+                    { method: "POST", body: fd }
+                );
+                let j = await r.json();
+                return j.secure_url;
+            } catch (error) {
+                console.error("Upload error:", error);
+                throw error;
+            }
         }
 
         // Upload PDF to Cloudinary
@@ -846,65 +1172,30 @@
             fd.append("upload_preset", "survey_app");
             fd.append("resource_type", "raw");
 
-            let r = await fetch(
-                "https://api.cloudinary.com/v1_1/dpeuqcbtm/raw/upload",
-                { method: "POST", body: fd }
-            );
-            let j = await r.json();
-            return j.secure_url;
-        }
-
-        // Open image in fullscreen zoomable view
-        function openImageViewer(images, startIndex) {
-            const pswpElement = document.querySelector('.pswp') || document.createElement('div');
-            pswpElement.className = 'pswp';
-            document.body.appendChild(pswpElement);
-
-            const options = {
-                index: startIndex,
-                bgOpacity: 0.9,
-                showHideOpacity: true,
-                loop: false,
-                closeOnVerticalDrag: true,
-                padding: { top: 20, bottom: 40, left: 20, right: 20 },
-                secondaryZoomLevel: 2,
-                maxZoomLevel: 4,
-            };
-
-            const items = images.map(src => ({
-                src: src,
-                width: 1200,  // These will be replaced by actual dimensions
-                height: 900,
-                alt: 'Survey photo'
-            }));
-
-            // Get actual image dimensions
-            items.forEach((item, i) => {
-                const img = new Image();
-                img.onload = function () {
-                    items[i].width = this.width;
-                    items[i].height = this.height;
-                };
-                img.src = item.src;
-            });
-
-            // @ts-ignore
-            pswp = new PhotoSwipe(pswpElement, PhotoSwipeLightbox, items, options);
-            pswp.init();
+            try {
+                let r = await fetch(
+                    "https://api.cloudinary.com/v1_1/dpeuqcbtm/raw/upload",
+                    { method: "POST", body: fd }
+                );
+                let j = await r.json();
+                return j.secure_url;
+            } catch (error) {
+                console.error("PDF upload error:", error);
+                throw error;
+            }
         }
 
         // Submit form
         async function submitForm() {
-            let name = document.getElementById("name").value.trim();
-            let house = document.getElementById("house").value.trim();
-            let ward = document.getElementById("ward").value;
-            let place = document.getElementById("place").value.trim();
-            let category = document.getElementById("category").value;
-            let year12 = document.getElementById("year12").value;
-            let toilet = document.getElementById("toilet").value;
-            let remarks = document.getElementById("remarks").value.trim();
-            let photos = document.getElementById("photos").files;
-            let pdfFile = document.getElementById("pdfFile").files[0];
+            let name = document.getElementById("name")?.value.trim() || "";
+            let house = document.getElementById("house")?.value.trim() || "";
+            let ward = document.getElementById("ward")?.value || "";
+            let place = document.getElementById("place")?.value.trim() || "";
+            let category = document.getElementById("category")?.value || "";
+            let year12 = document.getElementById("year12")?.value || "";
+            let toilet = document.getElementById("toilet")?.value || "";
+            let remarks = document.getElementById("remarks")?.value.trim() || "";
+            let pdfFile = document.getElementById("pdfFile")?.files[0];
 
             // Validation
             if (!name || !house || !place) {
@@ -917,8 +1208,10 @@
                 return;
             }
 
-            if (photos.length != 4) {
-                alert("Please select exactly 4 photos");
+            // Check if all 4 photos are selected
+            let selectedPhotos = Object.values(photoFiles).filter(f => f !== null);
+            if (selectedPhotos.length !== 4) {
+                alert("Please select all 4 photos");
                 return;
             }
 
@@ -928,24 +1221,37 @@
             }
 
             let submitBtn = document.getElementById("submitBtn");
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Uploading...';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Uploading...';
+            }
 
             try {
-                document.getElementById("status").innerHTML = '<div style="background: #e7f3ff; color: #004085; padding: 10px; border-radius: 8px;">📸 Uploading photos...</div>';
+                let statusEl = document.getElementById("status");
+                if (statusEl) {
+                    statusEl.innerHTML = '<div style="background: #e7f3ff; color: #004085; padding: 10px; border-radius: 8px;">📸 Uploading photos...</div>';
+                }
 
+                // Upload photos
                 let photoUrls = [];
-                for (let i = 0; i < photos.length; i++) {
-                    photoUrls.push(await uploadImage(photos[i]));
+                for (let i = 1; i <= 4; i++) {
+                    if (photoFiles[i]) {
+                        let url = await uploadImage(photoFiles[i]);
+                        photoUrls.push(url);
+                    }
                 }
 
                 let pdfUrl = "";
                 if (pdfFile) {
-                    document.getElementById("status").innerHTML = '<div style="background: #e7f3ff; color: #004085; padding: 10px; border-radius: 8px;">📄 Uploading PDF...</div>';
+                    if (statusEl) {
+                        statusEl.innerHTML = '<div style="background: #e7f3ff; color: #004085; padding: 10px; border-radius: 8px;">📄 Uploading PDF...</div>';
+                    }
                     pdfUrl = await uploadPDF(pdfFile);
                 }
 
-                document.getElementById("status").innerHTML = '<div style="background: #e7f3ff; color: #004085; padding: 10px; border-radius: 8px;">💾 Saving data...</div>';
+                if (statusEl) {
+                    statusEl.innerHTML = '<div style="background: #e7f3ff; color: #004085; padding: 10px; border-radius: 8px;">💾 Saving data...</div>';
+                }
 
                 let data = {
                     name: name,
@@ -958,10 +1264,10 @@
                     remarks: remarks,
                     lat: lat,
                     lng: lng,
-                    img1: photoUrls[0],
-                    img2: photoUrls[1],
-                    img3: photoUrls[2],
-                    img4: photoUrls[3],
+                    img1: photoUrls[0] || "",
+                    img2: photoUrls[1] || "",
+                    img3: photoUrls[2] || "",
+                    img4: photoUrls[3] || "",
                     pdf: pdfUrl
                 };
 
@@ -969,7 +1275,9 @@
                     { method: "POST", body: JSON.stringify(data) }
                 );
 
-                document.getElementById("status").innerHTML = '<div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 8px;">✅ Survey submitted successfully!</div>';
+                if (statusEl) {
+                    statusEl.innerHTML = '<div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 8px;">✅ Survey submitted successfully!</div>';
+                }
 
                 setTimeout(() => {
                     closeForm();
@@ -978,16 +1286,23 @@
 
             } catch (error) {
                 console.error(error);
-                document.getElementById("status").innerHTML = '<div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 8px;">❌ Error submitting survey</div>';
+                let statusEl = document.getElementById("status");
+                if (statusEl) {
+                    statusEl.innerHTML = '<div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 8px;">❌ Error submitting survey</div>';
+                }
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Submit Survey';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Submit Survey';
+                }
             }
         }
 
         // Load all surveys
         async function loadList() {
             let container = document.getElementById("surveysContainer");
+            if (!container) return;
+
             container.innerHTML = '<div style="padding: 20px;"><div class="skeleton" style="height: 80px; margin-bottom: 10px;"></div><div class="skeleton" style="height: 80px;"></div></div>';
 
             try {
@@ -1006,6 +1321,9 @@
 
         // Display surveys based on filters and view
         function displaySurveys() {
+            let container = document.getElementById("surveysContainer");
+            if (!container) return;
+
             let filtered = allSurveys;
 
             // Apply category filter
@@ -1025,19 +1343,24 @@
             }
 
             if (filtered.length === 0) {
-                document.getElementById("surveysContainer").innerHTML =
+                container.innerHTML =
                     '<div class="empty-state"><i class="fas fa-folder-open"></i><p>No surveys found</p></div>';
                 return;
             }
 
             let html = '';
             filtered.reverse().forEach(s => {
-                // Create a unique ID for each card
-                let cardId = 'card_' + Math.random().toString(36).substr(2, 9);
+                // Escape special characters for JSON
+                let safeName = (s.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                let safeHouse = (s.house || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                let safeWard = (s.ward || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                let safePlace = (s.place || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                let safeCategory = (s.category || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                let safeRemarks = (s.remarks || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                 if (currentView === 'compact') {
                     html += `
-                        <div class="compact-card" onclick="showDetails('${s.name?.replace(/'/g, "\\'") || ''}', '${s.house?.replace(/'/g, "\\'") || ''}', '${s.ward?.replace(/'/g, "\\'") || ''}', '${s.place?.replace(/'/g, "\\'") || ''}', '${s.category?.replace(/'/g, "\\'") || ''}', '${s.year12 || ''}', '${s.toilet || ''}', '${s.remarks?.replace(/'/g, "\\'") || ''}', '${s.img1 || ''}', '${s.img2 || ''}', '${s.img3 || ''}', '${s.img4 || ''}', '${s.pdf || ''}', '${s.lat || ''}', '${s.lng || ''}')">
+                        <div class="compact-card" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.img3 || ''}", "${s.img4 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
                             <div class="main-info">
                                 <h3><i class="fas fa-user" style="color: #667eea; margin-right: 6px;"></i>${s.name || 'N/A'}</h3>
                                 <div class="details">
@@ -1053,7 +1376,7 @@
                     `;
                 } else {
                     html += `
-                        <div style="background: white; border-radius: 16px; padding: 12px; margin: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;" onclick="showDetails('${s.name?.replace(/'/g, "\\'") || ''}', '${s.house?.replace(/'/g, "\\'") || ''}', '${s.ward?.replace(/'/g, "\\'") || ''}', '${s.place?.replace(/'/g, "\\'") || ''}', '${s.category?.replace(/'/g, "\\'") || ''}', '${s.year12 || ''}', '${s.toilet || ''}', '${s.remarks?.replace(/'/g, "\\'") || ''}', '${s.img1 || ''}', '${s.img2 || ''}', '${s.img3 || ''}', '${s.img4 || ''}', '${s.pdf || ''}', '${s.lat || ''}', '${s.lng || ''}')">
+                        <div style="background: white; border-radius: 16px; padding: 12px; margin: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.img3 || ''}", "${s.img4 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
                             <h4 style="margin: 0 0 8px 0;">${s.name}</h4>
                             <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: #666;">
                                 <span><i class="fas fa-home"></i> ${s.house}</span>
@@ -1065,23 +1388,23 @@
             });
 
             if (currentView === 'grid') {
-                document.getElementById("surveysContainer").innerHTML =
+                container.innerHTML =
                     '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px;">' + html + '</div>';
             } else {
-                document.getElementById("surveysContainer").innerHTML = html;
+                container.innerHTML = html;
             }
         }
 
         // Show details in modal
         function showDetails(name, house, ward, place, category, year12, toilet, remarks, img1, img2, img3, img4, pdf, lat, lng) {
             // Prepare image array for gallery
-            const images = [img1, img2, img3, img4].filter(img => img && img !== 'null' && img !== 'undefined');
+            const images = [img1, img2, img3, img4].filter(img => img && img !== 'null' && img !== 'undefined' && img !== '');
 
             let imageGrid = '';
             if (images.length > 0) {
                 imageGrid = '<div class="detail-image-grid">';
                 images.forEach((img, index) => {
-                    imageGrid += `<img src="${img}" onclick="event.stopPropagation(); openImageViewer(${JSON.stringify(images)}, ${index})" style="cursor: pointer;">`;
+                    imageGrid += `<img src="${img}" onclick='openLightbox(${JSON.stringify(images)}, ${index})' style="cursor: pointer;">`;
                 });
                 imageGrid += '</div>';
             }
@@ -1105,7 +1428,7 @@
             }
 
             let remarksHtml = '';
-            if (remarks && remarks !== 'null' && remarks !== 'undefined') {
+            if (remarks && remarks !== 'null' && remarks !== 'undefined' && remarks.trim() !== '') {
                 remarksHtml = `
                     <div class="remark-text">
                         <i class="fas fa-comment"></i> <strong>Remarks:</strong> ${remarks}
@@ -1114,7 +1437,7 @@
             }
 
             let pdfHtml = '';
-            if (pdf && pdf !== 'null' && pdf !== 'undefined') {
+            if (pdf && pdf !== 'null' && pdf !== 'undefined' && pdf !== '') {
                 pdfHtml = `
                     <div style="margin-top: 15px; text-align: center;">
                         <a href="${pdf}" target="_blank" style="display: inline-block; background: #ff4757; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none;">
@@ -1163,20 +1486,34 @@
                 ${pdfHtml}
             `;
 
-            document.getElementById("detailContent").innerHTML = html;
-            document.getElementById("detailModal").classList.add("active");
+            let detailContent = document.getElementById("detailContent");
+            if (detailContent) {
+                detailContent.innerHTML = html;
+            }
+
+            let detailModal = document.getElementById("detailModal");
+            if (detailModal) {
+                detailModal.classList.add("active");
+            }
         }
 
         // Close detail modal
         function closeDetail() {
-            document.getElementById("detailModal").classList.remove("active");
+            let detailModal = document.getElementById("detailModal");
+            if (detailModal) {
+                detailModal.classList.remove("active");
+            }
         }
 
         // Update statistics
         function updateStats() {
-            document.getElementById("totalSurveys").textContent = allSurveys.length;
-            document.getElementById("toiletCount").textContent = allSurveys.filter(s => s.toilet === 'Yes').length;
-            document.getElementById("year12Count").textContent = allSurveys.filter(s => s.year12 === 'Yes').length;
+            let totalEl = document.getElementById("totalSurveys");
+            let toiletEl = document.getElementById("toiletCount");
+            let year12El = document.getElementById("year12Count");
+
+            if (totalEl) totalEl.textContent = allSurveys.length;
+            if (toiletEl) toiletEl.textContent = allSurveys.filter(s => s.toilet === 'Yes').length;
+            if (year12El) year12El.textContent = allSurveys.filter(s => s.year12 === 'Yes').length;
         }
 
         // Filter by category
@@ -1192,19 +1529,25 @@
 
         // Search filter
         function filterSurveys() {
-            searchTerm = document.getElementById("searchInput").value;
+            let searchInput = document.getElementById("searchInput");
+            if (searchInput) {
+                searchTerm = searchInput.value;
+            }
             displaySurveys();
         }
 
         // Toggle view
         function toggleView(view) {
             currentView = view;
+            let compactBtn = document.getElementById('compactViewBtn');
+            let gridBtn = document.getElementById('gridViewBtn');
+
             if (view === 'compact') {
-                document.getElementById('compactViewBtn').classList.add('active');
-                document.getElementById('gridViewBtn').classList.remove('active');
+                if (compactBtn) compactBtn.classList.add('active');
+                if (gridBtn) gridBtn.classList.remove('active');
             } else {
-                document.getElementById('gridViewBtn').classList.add('active');
-                document.getElementById('compactViewBtn').classList.remove('active');
+                if (gridBtn) gridBtn.classList.add('active');
+                if (compactBtn) compactBtn.classList.remove('active');
             }
             displaySurveys();
         }
@@ -1212,32 +1555,63 @@
         // Modal controls
         function openForm() {
             // Reset form with "please select" options
-            document.getElementById("name").value = "";
-            document.getElementById("house").value = "";
-            document.getElementById("place").value = "";
-            document.getElementById("remarks").value = "";
+            let nameEl = document.getElementById("name");
+            let houseEl = document.getElementById("house");
+            let placeEl = document.getElementById("place");
+            let remarksEl = document.getElementById("remarks");
+            let wardEl = document.getElementById("ward");
+            let categoryEl = document.getElementById("category");
+            let year12El = document.getElementById("year12");
+            let toiletEl = document.getElementById("toilet");
 
-            // Reset selects to "please select" (disabled selected option)
-            document.getElementById("ward").value = "";
-            document.getElementById("category").value = "";
-            document.getElementById("year12").value = "";
-            document.getElementById("toilet").value = "";
+            if (nameEl) nameEl.value = "";
+            if (houseEl) houseEl.value = "";
+            if (placeEl) placeEl.value = "";
+            if (remarksEl) remarksEl.value = "";
 
-            // Clear file inputs
-            document.getElementById("photos").value = "";
-            document.getElementById("pdfFile").value = "";
-            document.getElementById("pdfName").innerHTML = "";
+            // Reset selects to "please select"
+            if (wardEl) wardEl.value = "";
+            if (categoryEl) categoryEl.value = "";
+            if (year12El) year12El.value = "";
+            if (toiletEl) toiletEl.value = "";
 
-            // Clear previews
-            for (let i = 0; i < 4; i++) {
-                document.getElementById("p" + (i + 1)).innerHTML = `Photo ${i + 1}`;
+            // Clear photo files and inputs
+            for (let i = 1; i <= 4; i++) {
+                let input = document.getElementById(`photo${i}`);
+                if (input) input.value = '';
+                photoFiles[i] = null;
+
+                let btn = document.getElementById(`photoBtn${i}`);
+                if (btn) {
+                    btn.innerHTML = `
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Photo ${i}</span>
+                        <small>Tap to select</small>
+                    `;
+                    btn.classList.remove('has-image');
+                }
             }
 
-            document.getElementById("formModal").classList.add("active");
+            // Clear PDF
+            let pdfInput = document.getElementById("pdfFile");
+            if (pdfInput) pdfInput.value = "";
+
+            let pdfNameEl = document.getElementById("pdfName");
+            if (pdfNameEl) pdfNameEl.innerHTML = "";
+
+            updatePhotoStatus();
+
+            let formModal = document.getElementById("formModal");
+            if (formModal) {
+                formModal.classList.add("active");
+            }
         }
 
         function closeForm() {
-            document.getElementById("formModal").classList.remove("active");
+            let formModal = document.getElementById("formModal");
+            if (formModal) {
+                formModal.classList.remove("active");
+            }
         }
 
         // Bottom navigation
@@ -1245,9 +1619,15 @@
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             event.currentTarget.classList.add('active');
             currentFilter = 'all';
-            document.querySelectorAll('.chip')[0].classList.add('active');
-            document.querySelectorAll('.chip').forEach((chip, i) => { if (i > 0) chip.classList.remove('active'); });
-            document.getElementById("searchInput").value = '';
+
+            let chips = document.querySelectorAll('.chip');
+            if (chips.length > 0) {
+                chips[0].classList.add('active');
+                chips.forEach((chip, i) => { if (i > 0) chip.classList.remove('active'); });
+            }
+
+            let searchInput = document.getElementById("searchInput");
+            if (searchInput) searchInput.value = '';
             searchTerm = '';
             displaySurveys();
         }
@@ -1255,13 +1635,19 @@
         function showFilter(event) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            document.querySelector('.filter-chips').scrollIntoView({ behavior: 'smooth' });
+            let filterChips = document.querySelector('.filter-chips');
+            if (filterChips) {
+                filterChips.scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         function showSearch(event) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            document.getElementById('searchInput').focus();
+            let searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.focus();
+            }
         }
 
         // Close modals when clicking outside
