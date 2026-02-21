@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     <!-- Simple lightbox for images (no PhotoSwipe) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -940,7 +942,12 @@
                     <i class="fas fa-satellite-dish"></i>
                     <span>Getting location...</span>
                 </div>
-
+                <div id="gpsMap" style="
+                        height:220px;
+                        border-radius:14px;
+                        margin-top:10px;
+                        overflow:hidden;
+                        "></div>
                 <button onclick="submitForm()" id="submitBtn"
                     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 16px; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;">
                     <i class="fas fa-cloud-upload-alt"></i> Submit Survey
@@ -1015,26 +1022,114 @@
         let currentImageIndex = 0;
 
         // Get user location
-        navigator.geolocation.getCurrentPosition(
-            p => {
-                lat = p.coords.latitude;
-                lng = p.coords.longitude;
-                locationObtained = true;
-                let statusEl = document.getElementById("locationStatus");
-                if (statusEl) {
-                    statusEl.innerHTML =
-                        `<i class="fas fa-check-circle" style="color: #28a745;"></i> Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                }
-            },
-            error => {
-                let statusEl = document.getElementById("locationStatus");
-                if (statusEl) {
-                    statusEl.innerHTML =
-                        '<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> Location not available. Please enable GPS.';
-                }
-            }
-        );
+        /* ⭐ PRO GPS ACCURACY MODE */
 
+        let watchId = null;
+        let bestAccuracy = 9999;
+
+        function startProLocation() {
+
+            const statusEl = document.getElementById("locationStatus");
+
+            if (statusEl) {
+                statusEl.innerHTML =
+                    `<i class="fas fa-satellite-dish"></i>
+       Getting precise GPS location...`;
+            }
+
+            watchId = navigator.geolocation.watchPosition(
+
+                pos => {
+
+                    let acc = pos.coords.accuracy;
+                    let newLat = pos.coords.latitude;
+                    let newLng = pos.coords.longitude;
+
+                    // Keep the BEST accuracy only
+                    if (acc < bestAccuracy) {
+
+                        bestAccuracy = acc;
+                        lat = newLat;
+                        lng = newLng;
+                        updateMap(newLat, newLng, acc);
+
+                        if (statusEl) {
+
+                            if (acc <= 20) {
+                                statusEl.innerHTML =
+                                    `<i class="fas fa-check-circle" style="color:#28a745;"></i>
+               GPS Locked (${Math.round(acc)}m accuracy)`;
+
+                                locationObtained = true;
+
+                                // Stop watching once accuracy is good
+                                navigator.geolocation.clearWatch(watchId);
+
+                            } else {
+
+                                statusEl.innerHTML =
+                                    `<i class="fas fa-location-arrow"></i>
+               Improving accuracy... ${Math.round(acc)}m`;
+
+                            }
+                        }
+                    }
+                },
+
+                err => {
+                    if (statusEl) {
+                        statusEl.innerHTML =
+                            `<i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i>
+           GPS error — enable High Accuracy`;
+                    }
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 30000,
+                    maximumAge: 0
+                }
+            );
+        }
+        /* ⭐ ADVANCED GPS MAP VIEW */
+
+        let map;
+        let marker;
+        let accuracyCircle;
+
+        function initMap() {
+
+            map = L.map('gpsMap').setView([10.0, 76.3], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: ''
+            }).addTo(map);
+        }
+
+        function updateMap(lat, lng, accuracy) {
+
+            if (!map) return;
+
+            if (!marker) {
+
+                marker = L.marker([lat, lng]).addTo(map);
+
+                accuracyCircle = L.circle([lat, lng], {
+                    radius: accuracy,
+                    color: '#667eea',
+                    fillColor: '#667eea',
+                    fillOpacity: 0.15
+                }).addTo(map);
+
+            } else {
+
+                marker.setLatLng([lat, lng]);
+                accuracyCircle.setLatLng([lat, lng]);
+                accuracyCircle.setRadius(accuracy);
+            }
+
+            map.setView([lat, lng], 18);
+        }
         // Handle photo selection
         function handlePhotoSelect(photoNum, input) {
             if (input.files && input.files[0]) {
@@ -1605,6 +1700,7 @@
             if (formModal) {
                 formModal.classList.add("active");
             }
+            setTimeout(initMap, 300);
         }
 
         function closeForm() {
@@ -1656,7 +1752,7 @@
                 event.target.classList.remove('active');
             }
         }
-
+        startProLocation();
         // Initial load
         loadList();
     </script>
