@@ -1406,77 +1406,132 @@
 
         // Display surveys based on filters and view
         function displaySurveys() {
-            let container = document.getElementById("surveysContainer");
+
+            const container = document.getElementById("surveysContainer");
             if (!container) return;
 
-            let filtered = allSurveys;
+            let filtered = [...allSurveys]; // clone array safely
 
-            // Apply category filter
+            // CATEGORY FILTER
             if (currentFilter !== 'all') {
-                filtered = filtered.filter(s => s.category === currentFilter);
+                filtered = filtered.filter(s => String(s.category ?? '') === currentFilter);
             }
 
-            // Apply search
+            // SEARCH FILTER
             if (searchTerm) {
-                let term = searchTerm.toLowerCase();
+                const term = searchTerm.toLowerCase();
+
                 filtered = filtered.filter(s =>
-                    (s.name && s.name.toLowerCase().includes(term)) ||
-                    (s.house && s.house.toLowerCase().includes(term)) ||
-                    (s.ward && s.ward.toLowerCase().includes(term)) ||
-                    (s.place && s.place.toLowerCase().includes(term))
+                    String(s.name ?? '').toLowerCase().includes(term) ||
+                    String(s.house ?? '').toLowerCase().includes(term) ||
+                    String(s.ward ?? '').toLowerCase().includes(term) ||
+                    String(s.place ?? '').toLowerCase().includes(term)
                 );
             }
 
+            // EMPTY STATE
             if (filtered.length === 0) {
                 container.innerHTML =
                     '<div class="empty-state"><i class="fas fa-folder-open"></i><p>No surveys found</p></div>';
                 return;
             }
 
-            let html = '';
-            filtered.reverse().forEach(s => {
-                // Escape special characters for JSON
-                let safeName = (s.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                let safeHouse = (s.house || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                let safeWard = (s.ward || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                let safePlace = (s.place || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                let safeCategory = (s.category || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                let safeRemarks = (s.remarks || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            container.innerHTML = '';
+
+            // ⭐ REVERSE WITHOUT BREAKING ORIGINAL ARRAY
+            filtered = filtered.slice().reverse();
+
+            const fragment = document.createDocumentFragment();
+
+            filtered.forEach(s => {
+
+                // ⭐ SAFE VALUES (NO replace(), NO escape issues)
+                const name = String(s.name ?? 'N/A');
+                const house = String(s.house ?? '');
+                const ward = String(s.ward ?? '');
+                const place = String(s.place ?? '');
+                const category = String(s.category ?? 'General');
+                const year12 = String(s.year12 ?? '');
+                const toilet = String(s.toilet ?? '');
+                const remarks = String(s.remarks ?? '');
+
+                const img1 = String(s.img1 ?? '');
+                const img2 = String(s.img2 ?? '');
+                const pdf = String(s.pdf ?? '');
+                const lat = String(s.lat ?? '');
+                const lng = String(s.lng ?? '');
+
+                // ⭐ CREATE CARD
+                const card = document.createElement("div");
 
                 if (currentView === 'compact') {
-                    html += `
-                        <div class="compact-card" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
-                            <div class="main-info">
-                                <h3><i class="fas fa-user" style="color: #667eea; margin-right: 6px;"></i>${s.name || 'N/A'}</h3>
-                                <div class="details">
-                                    <span><i class="fas fa-home"></i> ${s.house || ''}</span>
-                                    <span><i class="fas fa-map-marker-alt"></i> ${s.ward || ''}</span>
-                                    <span><i class="fas fa-location-dot"></i> ${s.place || ''}</span>
-                                </div>
-                            </div>
-                            <div class="badge">
-                                <i class="fas fa-tag"></i> ${s.category || 'General'}
-                            </div>
-                        </div>
-                    `;
+
+                    card.className = "compact-card";
+
+                    card.innerHTML = `
+                <div class="main-info">
+                    <h3>
+                        <i class="fas fa-user" style="color:#667eea;margin-right:6px;"></i>
+                        ${name}
+                    </h3>
+                    <div class="details">
+                        <span><i class="fas fa-home"></i> ${house}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> ${ward}</span>
+                        <span><i class="fas fa-location-dot"></i> ${place}</span>
+                    </div>
+                </div>
+                <div class="badge">
+                    <i class="fas fa-tag"></i> ${category}
+                </div>
+            `;
+
                 } else {
-                    html += `
-                        <div style="background: white; border-radius: 16px; padding: 12px; margin: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
-                            <h4 style="margin: 0 0 8px 0;">${s.name}</h4>
-                            <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: #666;">
-                                <span><i class="fas fa-home"></i> ${s.house}</span>
-                                <span><i class="fas fa-tag"></i> ${s.category}</span>
-                            </div>
-                        </div>
-                    `;
+
+                    card.style.cssText =
+                        "background:white;border-radius:16px;padding:12px;margin:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;";
+
+                    card.innerHTML = `
+                <h4 style="margin:0 0 8px 0;">${name}</h4>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#666;">
+                    <span><i class="fas fa-home"></i> ${house}</span>
+                    <span><i class="fas fa-tag"></i> ${category}</span>
+                </div>
+            `;
                 }
+
+                // ⭐ SAFE CLICK HANDLER (NO INLINE STRING JSON)
+                card.addEventListener("click", () => {
+                    showDetails(
+                        name,
+                        house,
+                        ward,
+                        place,
+                        category,
+                        year12,
+                        toilet,
+                        remarks,
+                        img1,
+                        img2,
+                        pdf,
+                        lat,
+                        lng
+                    );
+                });
+
+                fragment.appendChild(card);
             });
 
+            // ⭐ GRID VIEW WRAPPER
             if (currentView === 'grid') {
-                container.innerHTML =
-                    '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px;">' + html + '</div>';
+
+                const grid = document.createElement("div");
+                grid.style.cssText =
+                    "display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:8px;";
+                grid.appendChild(fragment);
+                container.appendChild(grid);
+
             } else {
-                container.innerHTML = html;
+                container.appendChild(fragment);
             }
         }
 
