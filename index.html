@@ -830,6 +830,18 @@
                             <option value="Ward 8">Ward 8</option>
                             <option value="Ward 9">Ward 9</option>
                             <option value="Ward 10">Ward 10</option>
+                            <option value="Ward 11">Ward 11</option>
+                            <option value="Ward 12">Ward 12</option>
+                            <option value="Ward 13">Ward 13</option>
+                            <option value="Ward 14">Ward 14</option>
+                            <option value="Ward 15">Ward 15</option>
+                            <option value="Ward 18">Ward 18</option>
+                            <option value="Ward 19">Ward 19</option>
+                            <option value="Ward 20">Ward 20</option>
+                            <option value="Ward 21">Ward 21</option>
+                            <option value="Ward 22">Ward 22</option>
+                            <option value="Ward 23">Ward 23</option>
+                            <option value="Ward 24">Ward 24</option>
                         </select>
                     </div>
 
@@ -852,7 +864,7 @@
 
                 <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div class="form-group">
-                        <label><i class="fas fa-graduation-cap"></i> 12th Completed</label>
+                        <label><i class="fas fa-graduation-cap"></i> 12 Year Completed</label>
                         <select class="form-control" id="year12">
                             <option value="" disabled selected>-- Select --</option>
                             <option value="Yes">Yes</option>
@@ -877,20 +889,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fas fa-camera"></i> Photos (4 required)</label>
+                    <label><i class="fas fa-camera"></i> Photos (2 required)</label>
                     <div class="photo-upload-note">
                         <i class="fas fa-info-circle"></i> Tap each button to select photos from gallery
                     </div>
 
-                    <!-- Hidden file inputs for each photo -->
+                    <!-- Hidden file inputs for each photo - ONLY 2 -->
                     <input type="file" id="photo1" accept="image/*" style="display: none;"
                         onchange="handlePhotoSelect(1, this)">
                     <input type="file" id="photo2" accept="image/*" style="display: none;"
                         onchange="handlePhotoSelect(2, this)">
-                    <input type="file" id="photo3" accept="image/*" style="display: none;"
-                        onchange="handlePhotoSelect(3, this)">
-                    <input type="file" id="photo4" accept="image/*" style="display: none;"
-                        onchange="handlePhotoSelect(4, this)">
 
                     <div class="photo-upload-grid">
                         <div class="photo-upload-btn" id="photoBtn1"
@@ -904,20 +912,6 @@
                             onclick="document.getElementById('photo2').click()">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <span>Photo 2</span>
-                            <small>Tap to select</small>
-                        </div>
-
-                        <div class="photo-upload-btn" id="photoBtn3"
-                            onclick="document.getElementById('photo3').click()">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Photo 3</span>
-                            <small>Tap to select</small>
-                        </div>
-
-                        <div class="photo-upload-btn" id="photoBtn4"
-                            onclick="document.getElementById('photo4').click()">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Photo 4</span>
                             <small>Tap to select</small>
                         </div>
                     </div>
@@ -1009,12 +1003,10 @@
         let currentView = 'compact';
         let searchTerm = '';
 
-        // Photo storage
+        // Photo storage - ONLY 2 PHOTOS
         let photoFiles = {
             1: null,
-            2: null,
-            3: null,
-            4: null
+            2: null
         };
 
         // Lightbox variables
@@ -1174,18 +1166,18 @@
             updatePhotoStatus();
         }
 
-        // Update photo status message
+        // Update photo status message - UPDATED FOR 2 PHOTOS
         function updatePhotoStatus() {
             let selectedCount = Object.values(photoFiles).filter(f => f !== null).length;
             let statusDiv = document.getElementById('photoStatus');
 
             if (statusDiv) {
                 if (selectedCount === 0) {
-                    statusDiv.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-circle"></i> No photos selected. Please select 4 photos.</span>';
-                } else if (selectedCount < 4) {
-                    statusDiv.innerHTML = `<span style="color: #ff9800;"><i class="fas fa-exclamation-triangle"></i> ${selectedCount}/4 photos selected. Need ${4 - selectedCount} more.</span>`;
+                    statusDiv.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-circle"></i> No photos selected. Please select 2 photos.</span>';
+                } else if (selectedCount < 2) {
+                    statusDiv.innerHTML = `<span style="color: #ff9800;"><i class="fas fa-exclamation-triangle"></i> ${selectedCount}/2 photos selected. Need ${2 - selectedCount} more.</span>`;
                 } else {
-                    statusDiv.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> All 4 photos selected!</span>';
+                    statusDiv.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> All 2 photos selected!</span>';
                 }
             }
         }
@@ -1280,7 +1272,7 @@
             }
         }
 
-        // Submit form
+        // Submit form - UPDATED FOR 2 PHOTOS
         async function submitForm() {
             let name = document.getElementById("name")?.value.trim() || "";
             let house = document.getElementById("house")?.value.trim() || "";
@@ -1303,10 +1295,10 @@
                 return;
             }
 
-            // Check if all 4 photos are selected
+            // Check if all 2 photos are selected
             let selectedPhotos = Object.values(photoFiles).filter(f => f !== null);
-            if (selectedPhotos.length !== 4) {
-                alert("Please select all 4 photos");
+            if (selectedPhotos.length !== 2) {
+                alert("Please select all 2 photos");
                 return;
             }
 
@@ -1327,9 +1319,9 @@
                     statusEl.innerHTML = '<div style="background: #e7f3ff; color: #004085; padding: 10px; border-radius: 8px;">📸 Uploading photos...</div>';
                 }
 
-                // Upload photos
+                // Upload photos - ONLY 2
                 let photoUrls = [];
-                for (let i = 1; i <= 4; i++) {
+                for (let i = 1; i <= 2; i++) {
                     if (photoFiles[i]) {
                         let url = await uploadImage(photoFiles[i]);
                         photoUrls.push(url);
@@ -1361,8 +1353,6 @@
                     lng: lng,
                     img1: photoUrls[0] || "",
                     img2: photoUrls[1] || "",
-                    img3: photoUrls[2] || "",
-                    img4: photoUrls[3] || "",
                     pdf: pdfUrl
                 };
 
@@ -1455,7 +1445,7 @@
 
                 if (currentView === 'compact') {
                     html += `
-                        <div class="compact-card" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.img3 || ''}", "${s.img4 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
+                        <div class="compact-card" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
                             <div class="main-info">
                                 <h3><i class="fas fa-user" style="color: #667eea; margin-right: 6px;"></i>${s.name || 'N/A'}</h3>
                                 <div class="details">
@@ -1471,7 +1461,7 @@
                     `;
                 } else {
                     html += `
-                        <div style="background: white; border-radius: 16px; padding: 12px; margin: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.img3 || ''}", "${s.img4 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
+                        <div style="background: white; border-radius: 16px; padding: 12px; margin: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;" onclick='showDetails("${safeName}", "${safeHouse}", "${safeWard}", "${safePlace}", "${safeCategory}", "${s.year12 || ''}", "${s.toilet || ''}", "${safeRemarks}", "${s.img1 || ''}", "${s.img2 || ''}", "${s.pdf || ''}", "${s.lat || ''}", "${s.lng || ''}")'>
                             <h4 style="margin: 0 0 8px 0;">${s.name}</h4>
                             <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: #666;">
                                 <span><i class="fas fa-home"></i> ${s.house}</span>
@@ -1490,10 +1480,10 @@
             }
         }
 
-        // Show details in modal
-        function showDetails(name, house, ward, place, category, year12, toilet, remarks, img1, img2, img3, img4, pdf, lat, lng) {
-            // Prepare image array for gallery
-            const images = [img1, img2, img3, img4].filter(img => img && img !== 'null' && img !== 'undefined' && img !== '');
+        // Show details in modal - UPDATED FOR 2 PHOTOS
+        function showDetails(name, house, ward, place, category, year12, toilet, remarks, img1, img2, pdf, lat, lng) {
+            // Prepare image array for gallery - ONLY 2
+            const images = [img1, img2].filter(img => img && img !== 'null' && img !== 'undefined' && img !== '');
 
             let imageGrid = '';
             if (images.length > 0) {
@@ -1647,7 +1637,7 @@
             displaySurveys();
         }
 
-        // Modal controls
+        // Modal controls - UPDATED FOR 2 PHOTOS
         function openForm() {
             // Reset form with "please select" options
             let nameEl = document.getElementById("name");
@@ -1670,8 +1660,8 @@
             if (year12El) year12El.value = "";
             if (toiletEl) toiletEl.value = "";
 
-            // Clear photo files and inputs
-            for (let i = 1; i <= 4; i++) {
+            // Clear photo files and inputs - ONLY 2
+            for (let i = 1; i <= 2; i++) {
                 let input = document.getElementById(`photo${i}`);
                 if (input) input.value = '';
                 photoFiles[i] = null;
